@@ -1,0 +1,64 @@
+{
+  "name": "birthday-range",
+  "version": "1.0.0",
+  "description": "Calculate possible birthday ranges from partial info",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run --coverage",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "docs:build": "typedoc"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "birthday",
+    "dob",
+    "birthdate",
+    "temporal",
+    "zodiac",
+    "age"
+  ],
+  "author": "fixicelo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fixicelo/birthday-range.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fixicelo/birthday-range/issues"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.22.0",
+  "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "4.0.9",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "tsdown": "^0.16.5",
+    "typedoc": "^0.28.14",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^4.0.9"
+  }
+}

@@ -1,0 +1,9 @@
+# Ignore artifacts:
+build
+docs
+.vscode
+pnpm-lock.yaml
+README.md
+
+# Ignore all HTML files:
+**/*.html

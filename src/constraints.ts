@@ -209,107 +209,54 @@ export class MonthConstraint extends BaseConstraint {
   }
 }
 
-/**
- * A mapping of zodiac signs to their corresponding month-day ranges.
- * @internal
- */
-const ZODIAC_RANGES: Record<string, PlainMonthDayRange[]> = {
-  aries: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 3, day: 21 }),
-      end: Temporal.PlainMonthDay.from({ month: 4, day: 19 }),
-    },
-  ],
-  taurus: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 4, day: 20 }),
-      end: Temporal.PlainMonthDay.from({ month: 5, day: 20 }),
-    },
-  ],
-  gemini: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 5, day: 21 }),
-      end: Temporal.PlainMonthDay.from({ month: 6, day: 21 }),
-    },
-  ],
-  cancer: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 6, day: 22 }),
-      end: Temporal.PlainMonthDay.from({ month: 7, day: 22 }),
-    },
-  ],
-  leo: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 7, day: 23 }),
-      end: Temporal.PlainMonthDay.from({ month: 8, day: 22 }),
-    },
-  ],
-  virgo: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 8, day: 23 }),
-      end: Temporal.PlainMonthDay.from({ month: 9, day: 22 }),
-    },
-  ],
-  libra: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 9, day: 23 }),
-      end: Temporal.PlainMonthDay.from({ month: 10, day: 22 }),
-    },
-  ],
-  scorpio: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 10, day: 23 }),
-      end: Temporal.PlainMonthDay.from({ month: 11, day: 21 }),
-    },
-  ],
-  sagittarius: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 11, day: 22 }),
-      end: Temporal.PlainMonthDay.from({ month: 12, day: 21 }),
-    },
-  ],
-  capricorn: [
-    // end date is in the next year
-    {
-      start: Temporal.PlainMonthDay.from({ month: 12, day: 22 }),
-      end: Temporal.PlainMonthDay.from({ month: 12, day: 31 }),
-    },
-    {
-      start: Temporal.PlainMonthDay.from({ month: 1, day: 1 }),
-      end: Temporal.PlainMonthDay.from({ month: 1, day: 19 }),
-    },
-  ],
-  aquarius: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 1, day: 20 }),
-      end: Temporal.PlainMonthDay.from({ month: 2, day: 18 }),
-    },
-  ],
-  pisces: [
-    {
-      start: Temporal.PlainMonthDay.from({ month: 2, day: 19 }),
-      end: Temporal.PlainMonthDay.from({ month: 3, day: 20 }),
-    },
-  ],
-};
+import {
+  getZodiacDateRange,
+  getZodiacSign,
+  ZodiacSign,
+} from 'zodiac-mapper';
 
 /**
  * A constraint that restricts birthdays to a specific zodiac sign.
  */
 export class ZodiacConstraint extends BaseConstraint {
+  private zodiacSign: ZodiacSign;
   constructor(private zodiac: string) {
     super('zodiac');
 
-    if (!(zodiac.toLowerCase() in ZODIAC_RANGES)) {
+    const sign = getZodiacSign(zodiac);
+    if (sign === null) {
       throw new Error(`Invalid zodiac sign: ${zodiac}`);
     }
+    this.zodiacSign = sign;
   }
 
   prepareContext(ctx: CalculationContext): void {
     ctx.zodiac = this.zodiac;
   }
   apply(ctx: CalculationContext): CalculationContext {
-    const mdr = ZODIAC_RANGES[this.zodiac.toLowerCase()];
+    const zodiacDateRange = getZodiacDateRange(this.zodiacSign);
+
+    let mdr: PlainMonthDayRange[];
+
+    if (zodiacDateRange.crossesYear) {
+      mdr = [
+        {
+          start: Temporal.PlainMonthDay.from(zodiacDateRange.start),
+          end: Temporal.PlainMonthDay.from({ month: 12, day: 31 }),
+        },
+        {
+          start: Temporal.PlainMonthDay.from({ month: 1, day: 1 }),
+          end: Temporal.PlainMonthDay.from(zodiacDateRange.end),
+        },
+      ];
+    } else {
+      mdr = [
+        {
+          start: Temporal.PlainMonthDay.from(zodiacDateRange.start),
+          end: Temporal.PlainMonthDay.from(zodiacDateRange.end),
+        },
+      ];
+    }
 
     const monthDayRanges = calculateNewMonthDayRanges(ctx.monthDayRanges, mdr);
 

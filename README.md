@@ -117,7 +117,7 @@ All constraint methods return a **new, immutable `BirthdayRange` instance**.
 - `.age(age: number, options?: { asOfDate?: string | Temporal.PlainDate })`: Calculates the date range for a given age as of a reference date (defaults to today).
 - `.month(month: number)`: Restricts birthdays to a specific month (1-12).
 - `.day(day: number)`: Restricts birthdays to a specific day of the month (1-31).
-- `.zodiac(sign: string)`: Restricts to a zodiac sign (case-insensitive).
+- `.zodiac(sign: string)`: Restricts to a zodiac sign. Supports names in multiple languages (e.g., "Aries", "獅子座", "Taureau").
 - `.isLeapYear(isLeap: boolean)`: Filters for birthdays that fall in a leap year or not.
 - `.add(constraint: Constraint)`: Adds a custom-defined constraint to the calculation.
 

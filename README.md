@@ -1,5 +1,8 @@
 # 🎂 Birthday Range Calculator
 
+[![npm version](https://img.shields.io/npm/v/birthday-range.svg)](https://www.npmjs.com/package/birthday-range)
+[![License](https://img.shields.io/npm/l/birthday-range.svg)](https://github.com/fixicelo/birthday-range/blob/main/LICENSE)
+
 A TypeScript library for calculating possible birthday date ranges from partial information like age, zodiac sign, month, or year. It is built on the Temporal API via `@js-temporal/polyfill`.
 
 ## ✨ Key Features

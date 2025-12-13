@@ -46,19 +46,20 @@
     "url": "https://github.com/fixicelo/birthday-range/issues"
   },
   "license": "MIT",
-  "packageManager": "pnpm@10.22.0",
+  "packageManager": "pnpm@10.25.0",
   "dependencies": {
-    "@js-temporal/polyfill": "^0.5.1"
+    "@js-temporal/polyfill": "^0.5.1",
+    "zodiac-mapper": "^0.1.0"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "4.0.9",
-    "eslint": "^9.39.1",
+    "@vitest/coverage-v8": "^4.0.15",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.6.2",
-    "tsdown": "^0.16.5",
-    "typedoc": "^0.28.14",
+    "prettier": "^3.7.4",
+    "tsdown": "^0.17.3",
+    "typedoc": "^0.28.15",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vitest": "^4.0.9"
+    "typescript-eslint": "^8.49.0",
+    "vitest": "^4.0.15"
   }
 }

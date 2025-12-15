@@ -7,6 +7,7 @@ import {
   calculateNewDateRanges,
   calculateNewMonthDayRanges,
   splitMonthDayRangeForNonLeapYear,
+  mergeDateRanges,
 } from '../src/utils/range-ops.js';
 import { PlainDateRange, PlainMonthDayRange } from '../src/index.js';
 
@@ -242,5 +243,111 @@ describe('calculateNewMonthDayRanges', () => {
     ];
 
     expect(calculateNewMonthDayRanges([], newRanges)).toEqual([]);
+  });
+});
+
+describe('mergeDateRanges', () => {
+  it('should return empty array for empty input', () => {
+    expect(mergeDateRanges([])).toEqual([]);
+  });
+
+  it('should return the same range for single range input', () => {
+    const dr: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-01'),
+      end: Temporal.PlainDate.from('2023-01-31'),
+    };
+    expect(mergeDateRanges([dr])).toEqual([dr]);
+  });
+
+  it('should merge adjacent ranges', () => {
+    const r1: PlainDateRange = {
+      start: Temporal.PlainDate.from('1998-12-16'),
+      end: Temporal.PlainDate.from('1998-12-31'),
+    };
+    const r2: PlainDateRange = {
+      start: Temporal.PlainDate.from('1999-01-01'),
+      end: Temporal.PlainDate.from('1999-12-15'),
+    };
+    const expected: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('1998-12-16'),
+        end: Temporal.PlainDate.from('1999-12-15'),
+      },
+    ];
+    expect(mergeDateRanges([r1, r2])).toEqual(expected);
+  });
+
+  it('should merge overlapping ranges', () => {
+    const r1: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-01'),
+      end: Temporal.PlainDate.from('2023-01-15'),
+    };
+    const r2: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-10'),
+      end: Temporal.PlainDate.from('2023-01-20'),
+    };
+    const expected: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2023-01-01'),
+        end: Temporal.PlainDate.from('2023-01-20'),
+      },
+    ];
+    expect(mergeDateRanges([r1, r2])).toEqual(expected);
+  });
+
+  it('should not merge separated ranges', () => {
+    const r1: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-01'),
+      end: Temporal.PlainDate.from('2023-01-10'),
+    };
+    const r2: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-12'),
+      end: Temporal.PlainDate.from('2023-01-20'),
+    };
+    expect(mergeDateRanges([r1, r2])).toEqual([r1, r2]);
+  });
+
+  it('should handle unsorted ranges', () => {
+    const r1: PlainDateRange = {
+      start: Temporal.PlainDate.from('1999-01-01'),
+      end: Temporal.PlainDate.from('1999-12-15'),
+    };
+    const r2: PlainDateRange = {
+      start: Temporal.PlainDate.from('1998-12-16'),
+      end: Temporal.PlainDate.from('1998-12-31'),
+    };
+    const expected: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('1998-12-16'),
+        end: Temporal.PlainDate.from('1999-12-15'),
+      },
+    ];
+    expect(mergeDateRanges([r1, r2])).toEqual(expected);
+  });
+
+  it('should merge multiple ranges', () => {
+    const r1: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-01'),
+      end: Temporal.PlainDate.from('2023-01-05'),
+    };
+    const r2: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-06'),
+      end: Temporal.PlainDate.from('2023-01-10'),
+    };
+    const r3: PlainDateRange = {
+      start: Temporal.PlainDate.from('2023-01-12'),
+      end: Temporal.PlainDate.from('2023-01-15'),
+    };
+    const expected: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2023-01-01'),
+        end: Temporal.PlainDate.from('2023-01-10'),
+      },
+      {
+        start: Temporal.PlainDate.from('2023-01-12'),
+        end: Temporal.PlainDate.from('2023-01-15'),
+      },
+    ];
+    expect(mergeDateRanges([r1, r2, r3])).toEqual(expected);
   });
 });

@@ -327,3 +327,55 @@ export function splitMonthDayRangeForNonLeapYear(
 
   return result;
 }
+
+/**
+ * Merges a list of {@link PlainDateRange} objects.
+ * Overlapping or adjacent ranges are combined into a single range.
+ * The result is sorted by start date.
+ *
+ * @param ranges The array of {@link PlainDateRange} objects to merge.
+ * @returns A new array of merged {@link PlainDateRange} objects.
+ */
+export function mergeDateRanges(ranges: PlainDateRange[]): PlainDateRange[] {
+  if (ranges.length === 0) {
+    return [];
+  }
+
+  // Sort ranges by start date
+  const sortedRanges = [...ranges].sort((a, b) =>
+    Temporal.PlainDate.compare(a.start, b.start)
+  );
+
+  const merged: PlainDateRange[] = [];
+  let currentRange = sortedRanges[0];
+
+  for (let i = 1; i < sortedRanges.length; i++) {
+    const nextRange = sortedRanges[i];
+
+    // Check if nextRange overlaps or is adjacent to currentRange
+    // Adjacent means nextRange.start <= currentRange.end + 1 day
+    const currentEndPlusOne = currentRange.end.add({ days: 1 });
+
+    if (Temporal.PlainDate.compare(nextRange.start, currentEndPlusOne) <= 0) {
+      // Merge ranges
+      // The end date is the max of the two end dates
+      const newEnd =
+        Temporal.PlainDate.compare(currentRange.end, nextRange.end) >= 0
+          ? currentRange.end
+          : nextRange.end;
+
+      currentRange = {
+        start: currentRange.start,
+        end: newEnd,
+      };
+    } else {
+      // No overlap/adjacency, push currentRange and start a new one
+      merged.push(currentRange);
+      currentRange = nextRange;
+    }
+  }
+
+  merged.push(currentRange);
+
+  return merged;
+}

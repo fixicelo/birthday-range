@@ -8,6 +8,7 @@ export {
   calculateNewDateRanges,
   calculateNewMonthDayRanges,
   intersectDateRangeWithMonthDayRange,
+  mergeDateRanges,
 } from './utils/range-ops.js';
 
 // Re-export all public types from the dedicated types file

@@ -217,6 +217,20 @@ console.log(q1WithYear.calc().monthDayRanges);
 // [{"start":"02-01","end":"02-28"}]
 ```
 
+## 🧰 Utility Functions
+
+### `mergeDateRanges(ranges: PlainDateRange[])`
+
+Since this package splits ranges by year (e.g. `Dec 31` and `Jan 01` are separated), you can use this helper to merge adjacent ranges back together.
+
+```typescript
+import { mergeDateRanges } from 'birthday-range';
+
+// Merges [2000-12-16 -> 2000-12-31] and [2001-01-01 -> 2001-12-15]
+const merged = mergeDateRanges(result.dateRanges);
+// Result: [{ start: '2000-12-16', end: '2001-12-15' }]
+```
+
 ## 🛠️ Development
 
 This project uses `pnpm` as its package manager.

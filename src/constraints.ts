@@ -1,5 +1,7 @@
 import { Temporal } from '@js-temporal/polyfill';
+import { getZodiacDateRange, getZodiacSign, ZodiacSign } from 'zodiac-mapper';
 import type { CalculationContext, PlainMonthDayRange } from './types.js';
+import { ensureNumber } from './utils/parsing.js';
 import {
   calculateNewDateRanges,
   calculateNewMonthDayRanges,
@@ -48,8 +50,11 @@ export abstract class BaseConstraint implements Constraint {
  * A constraint that restricts birthdays to a specific year.
  */
 export class YearConstraint extends BaseConstraint {
-  constructor(private year: number) {
+  private year: number;
+
+  constructor(year: number | string) {
     super('year');
+    this.year = ensureNumber(year, 'Year must be a valid number');
   }
   prepareContext(ctx: CalculationContext): void {
     ctx.year = this.year;
@@ -81,15 +86,19 @@ export class YearConstraint extends BaseConstraint {
  * A constraint that restricts birthdays based on a person's age as of a certain date.
  */
 export class AgeConstraint extends BaseConstraint {
+  private age: number;
+
   constructor(
-    private age: number,
+    age: number | string,
     private asOfDate?: Temporal.PlainDate | string
   ) {
     super('age');
 
-    if (this.age < 0) {
-      throw new Error('Age cannot be negative');
-    }
+    this.age = ensureNumber(
+      age,
+      'Age must be a non-negative number',
+      (n) => n >= 0
+    );
   }
   prepareContext(ctx: CalculationContext): void {
     ctx.age = this.age;
@@ -126,6 +135,7 @@ export class IsLeapYearConstraint extends BaseConstraint {
   constructor(private isLeapYear: boolean) {
     super('isLeapYear');
   }
+
   prepareContext(ctx: CalculationContext): void {
     ctx.isLeapYear = this.isLeapYear;
   }
@@ -167,12 +177,12 @@ export class IsLeapYearConstraint extends BaseConstraint {
  * A constraint that restricts birthdays to a specific month.
  */
 export class MonthConstraint extends BaseConstraint {
-  constructor(private month: number) {
+  private month: number;
+
+  constructor(month: number | string) {
     super('month');
 
-    if (this.month < 1 || this.month > 12) {
-      throw new Error('Invalid month');
-    }
+    this.month = ensureNumber(month, 'Invalid month', (n) => n >= 1 && n <= 12);
   }
   prepareContext(ctx: CalculationContext): void {
     ctx.month = this.month;
@@ -209,17 +219,12 @@ export class MonthConstraint extends BaseConstraint {
   }
 }
 
-import {
-  getZodiacDateRange,
-  getZodiacSign,
-  ZodiacSign,
-} from 'zodiac-mapper';
-
 /**
  * A constraint that restricts birthdays to a specific zodiac sign.
  */
 export class ZodiacConstraint extends BaseConstraint {
   private zodiacSign: ZodiacSign;
+
   constructor(private zodiac: string) {
     super('zodiac');
 
@@ -281,12 +286,12 @@ export class ZodiacConstraint extends BaseConstraint {
  * A constraint that restricts birthdays to a specific day of the month.
  */
 export class DayConstraint extends BaseConstraint {
-  constructor(private day: number) {
+  private day: number;
+
+  constructor(day: number | string) {
     super('day');
 
-    if (this.day < 1 || this.day > 31) {
-      throw new Error('Invalid day');
-    }
+    this.day = ensureNumber(day, 'Invalid day', (n) => n >= 1 && n <= 31);
   }
   prepareContext(ctx: CalculationContext): void {
     ctx.day = this.day;

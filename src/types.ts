@@ -54,16 +54,19 @@ export type CalculationContext = CalculationResult;
  */
 export interface BirthdayRangeOptions {
   /** Restricts birthdays to a specific year. */
-  year?: number;
+  year?: number | string;
   /**
-   * Restricts birthdays based on age. Can be a number or an object
-   * with a `value` for the age and an optional `asOfDate`.
+   * Restricts birthdays based on age. Can be a number, a string representing a number,
+   * or an object with a `value` for the age and an optional `asOfDate`.
    */
-  age?: number | { value: number; asOfDate?: string | Temporal.PlainDate };
+  age?:
+    | number
+    | string
+    | { value: number | string; asOfDate?: string | Temporal.PlainDate };
   /** Restricts birthdays to a specific month (1-12). */
-  month?: number;
+  month?: number | string;
   /** Restricts birthdays to a specific day of the month (1-31). */
-  day?: number;
+  day?: number | string;
   /** Restricts birthdays to a specific zodiac sign (case-insensitive). */
   zodiac?: string;
   /** Filters for birthdays that fall in a leap year (`true`) or not (`false`). */

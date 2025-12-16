@@ -41,7 +41,9 @@ describe('AgeConstraint', () => {
   });
 
   it('should throw an error for a negative age from constructor', () => {
-    expect(() => new AgeConstraint(-5)).toThrow('Age cannot be negative');
+    expect(() => new AgeConstraint(-5)).toThrow(
+      'Age must be a non-negative number'
+    );
   });
 
   it('should handle age 0', () => {

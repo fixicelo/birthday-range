@@ -53,7 +53,10 @@ export default class BirthdayRange {
         constraints.push(new YearConstraint(options.year));
       }
       if (options.age !== undefined) {
-        if (typeof options.age === 'number') {
+        if (
+          typeof options.age === 'number' ||
+          typeof options.age === 'string'
+        ) {
           constraints.push(new AgeConstraint(options.age));
         } else {
           constraints.push(
@@ -91,7 +94,7 @@ export default class BirthdayRange {
    * @param year The year to filter by.
    * @returns A new `BirthdayRange` instance with the added constraint.
    */
-  year(year: number): BirthdayRange {
+  year(year: number | string): BirthdayRange {
     return this.addConstraint(new YearConstraint(year));
   }
 
@@ -103,7 +106,7 @@ export default class BirthdayRange {
    * @returns A new `BirthdayRange` instance with the added constraint.
    */
   age(
-    age: number,
+    age: number | string,
     opts?: { asOfDate?: string | Temporal.PlainDate }
   ): BirthdayRange {
     return this.addConstraint(new AgeConstraint(age, opts?.asOfDate));
@@ -114,7 +117,7 @@ export default class BirthdayRange {
    * @param month The month number (1-12).
    * @returns A new `BirthdayRange` instance with the added constraint.
    */
-  month(month: number): BirthdayRange {
+  month(month: number | string): BirthdayRange {
     return this.addConstraint(new MonthConstraint(month));
   }
 
@@ -123,7 +126,7 @@ export default class BirthdayRange {
    * @param day The day number (1-31).
    * @returns A new `BirthdayRange` instance with the added constraint.
    */
-  day(day: number): BirthdayRange {
+  day(day: number | string): BirthdayRange {
     return this.addConstraint(new DayConstraint(day));
   }
 

@@ -7,6 +7,7 @@ import BirthdayRange, {
   calculateNewMonthDayRanges,
   intersectDateRangeWithMonthDayRange,
   mergeDateRanges,
+  calculateAgeRange,
   PlainDateRange,
 } from '../src/index.js';
 import { Temporal } from '@js-temporal/polyfill';
@@ -185,5 +186,35 @@ describe('README Examples', () => {
         end: Temporal.PlainDate.from('2001-12-15'),
       },
     ]);
+  });
+
+  it('Utility Functions: calculateAgeRange', () => {
+    // Assume we have calculated ranges for someone born in 2000 as of 2023-06-01
+    const asOfDate = Temporal.PlainDate.from('2023-06-01');
+
+    // Method 1:
+    const result1 = calculateAgeRange({ year: 2000 }, asOfDate);
+    expect(result1).toEqual({ min: 22, max: 23 });
+
+    // Method 2:
+    const result2 = calculateAgeRange(
+      [
+        {
+          start: Temporal.PlainDate.from('2000-01-01'),
+          end: Temporal.PlainDate.from('2000-12-31'),
+        },
+      ],
+      asOfDate
+    );
+    // Result: { min: 22, max: 23 }
+    expect(result2).toEqual({ min: 22, max: 23 });
+
+    // If month/day are omitted, the full range of that year/month is considered.
+    const ageRangeFromDate = calculateAgeRange(
+      { year: 2000, month: 2 },
+      asOfDate
+    );
+    // Result: { min: 23, max: 23 } (since Feb 2000 is before June 2023)
+    expect(ageRangeFromDate).toEqual({ min: 23, max: 23 });
   });
 });

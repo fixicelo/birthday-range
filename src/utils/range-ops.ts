@@ -379,3 +379,84 @@ export function mergeDateRanges(ranges: PlainDateRange[]): PlainDateRange[] {
 
   return merged;
 }
+
+/**
+ * Calculates the minimum and maximum age for a given set of birth date ranges relative to a reference date.
+ *
+ * @param ranges The array of {@link PlainDateRange} objects representing possible birth dates.
+ * @param asOfDate The reference date to calculate age against. Defaults to current date (ISO).
+ * @returns An object containing `min` and `max` age, or `null` if the input ranges array is empty.
+ */
+export function calculateAgeRange(
+  ranges: PlainDateRange[],
+  asOfDate?: Temporal.PlainDate
+): { min: number; max: number } | null;
+
+/**
+ * Calculates the minimum and maximum age for a specific birth date (year, month, day) relative to a reference date.
+ *
+ * @param birthDate An object containing `year`, and optionally `month` and `day`.
+ *                  - If `month` is missing, it defaults to the full year (Jan 1st to Dec 31st).
+ *                  - If `day` is missing, it defaults to the full month (1st to last day).
+ *                  - `year` is required.
+ * @param asOfDate The reference date to calculate age against. Defaults to current date (ISO).
+ * @returns An object containing `min` and `max` age.
+ * @throws {Error} If `year` is missing in the birthDate object.
+ */
+export function calculateAgeRange(
+  birthDate: { year: number; month?: number; day?: number },
+  asOfDate?: Temporal.PlainDate
+): { min: number; max: number };
+
+export function calculateAgeRange(
+  input: PlainDateRange[] | { year: number; month?: number; day?: number },
+  asOfDate: Temporal.PlainDate = Temporal.Now.plainDateISO()
+): { min: number; max: number } | null {
+  let earliest: Temporal.PlainDate;
+  let latest: Temporal.PlainDate;
+
+  if (Array.isArray(input)) {
+    if (input.length === 0) {
+      return null;
+    }
+
+    // Find the global min start date and max end date
+    earliest = input[0].start;
+    latest = input[0].end;
+
+    for (let i = 1; i < input.length; i++) {
+      const range = input[i];
+      if (Temporal.PlainDate.compare(range.start, earliest) < 0) {
+        earliest = range.start;
+      }
+      if (Temporal.PlainDate.compare(range.end, latest) > 0) {
+        latest = range.end;
+      }
+    }
+  } else {
+    const { year, month, day } = input;
+
+    if (year === undefined) {
+      throw new Error('Year is required for age calculation.');
+    }
+
+    earliest = Temporal.PlainDate.from({
+      year,
+      month: month ?? 1,
+      day: day ?? 1,
+    });
+
+    latest = Temporal.PlainDate.from({
+      year,
+      month: month ?? 12,
+      day: day ?? 31,
+    });
+  }
+
+  // Earliest birth date => Oldest age (Max)
+  // Latest birth date => Youngest age (Min)
+  const maxAge = asOfDate.since(earliest, { largestUnit: 'years' }).years;
+  const minAge = asOfDate.since(latest, { largestUnit: 'years' }).years;
+
+  return { min: minAge, max: maxAge };
+}

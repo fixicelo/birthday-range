@@ -5,6 +5,7 @@ export { Temporal } from '@js-temporal/polyfill';
 export { BaseConstraint } from './constraints.js';
 export type { Constraint } from './constraints.js';
 export {
+  calculateAgeRange,
   calculateNewDateRanges,
   calculateNewMonthDayRanges,
   intersectDateRangeWithMonthDayRange,

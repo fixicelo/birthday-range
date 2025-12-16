@@ -8,6 +8,7 @@ import {
   calculateNewMonthDayRanges,
   splitMonthDayRangeForNonLeapYear,
   mergeDateRanges,
+  calculateAgeRange,
 } from '../src/utils/range-ops.js';
 import { PlainDateRange, PlainMonthDayRange } from '../src/index.js';
 
@@ -349,5 +350,166 @@ describe('mergeDateRanges', () => {
       },
     ];
     expect(mergeDateRanges([r1, r2, r3])).toEqual(expected);
+  });
+});
+
+describe('calculateAgeRange', () => {
+  it('should return null for empty ranges', () => {
+    const asOfDate = Temporal.PlainDate.from('2023-01-01');
+    expect(calculateAgeRange([], asOfDate)).toBeNull();
+  });
+
+  it('should calculate age for a single range', () => {
+    const ranges: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2000-01-01'),
+        end: Temporal.PlainDate.from('2000-12-31'),
+      },
+    ];
+    const asOfDate = Temporal.PlainDate.from('2023-06-01');
+    // 2000-01-01 -> 23 years
+    // 2000-12-31 -> 22 years
+    const result = calculateAgeRange(ranges, asOfDate);
+    expect(result).toEqual({ min: 22, max: 23 });
+  });
+
+  it('should calculate age for multiple ranges', () => {
+    const ranges: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('1990-01-01'),
+        end: Temporal.PlainDate.from('1990-01-01'),
+      },
+      {
+        start: Temporal.PlainDate.from('2000-01-01'),
+        end: Temporal.PlainDate.from('2000-01-01'),
+      },
+    ];
+    const asOfDate = Temporal.PlainDate.from('2023-01-01');
+    // 1990 -> 33
+    // 2000 -> 23
+    const result = calculateAgeRange(ranges, asOfDate);
+    expect(result).toEqual({ min: 23, max: 33 });
+  });
+
+  it('should handle exact birthdays', () => {
+    const ranges: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2000-06-01'),
+        end: Temporal.PlainDate.from('2000-06-01'),
+      },
+    ];
+    const asOfDate = Temporal.PlainDate.from('2023-06-01');
+    // Exactly 23
+    const result = calculateAgeRange(ranges, asOfDate);
+    expect(result).toEqual({ min: 23, max: 23 });
+  });
+
+  it('should handle day before birthday', () => {
+    const ranges: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2000-06-02'),
+        end: Temporal.PlainDate.from('2000-06-02'),
+      },
+    ];
+    const asOfDate = Temporal.PlainDate.from('2023-06-01');
+    // Not yet 23, so 22
+    const result = calculateAgeRange(ranges, asOfDate);
+    expect(result).toEqual({ min: 22, max: 22 });
+  });
+
+  it('should handle negative ages (future birth dates)', () => {
+    const ranges: PlainDateRange[] = [
+      {
+        start: Temporal.PlainDate.from('2025-01-01'),
+        end: Temporal.PlainDate.from('2025-12-31'),
+      },
+    ];
+    const asOfDate = Temporal.PlainDate.from('2023-01-01');
+    // 2025-01-01 -> -2
+    // 2025-12-31 -> -2 (almost -3 but years is integer truncation usually towards zero? No, since returns negative)
+    // 2023-01-01 since 2025-01-01 is -2 years.
+    // 2023-01-01 since 2025-12-31 is -2 years (duration is P-2Y-11M-30D, years property is -2)
+
+    const result = calculateAgeRange(ranges, asOfDate);
+    expect(result).toEqual({ min: -2, max: -2 });
+  });
+
+  describe('Overload: birthDate object', () => {
+    it('should calculate age for year only', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      // 2000-01-01 -> 23
+      // 2000-12-31 -> 22
+      const result = calculateAgeRange({ year: 2000 }, asOfDate);
+      expect(result).toEqual({ min: 22, max: 23 });
+    });
+
+    it('should calculate age for year and month', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      // 2000-02-01 -> 23
+      // 2000-02-29 -> 23
+      const result = calculateAgeRange({ year: 2000, month: 2 }, asOfDate);
+      expect(result).toEqual({ min: 23, max: 23 });
+
+      const asOfDate2 = Temporal.PlainDate.from('2023-01-01');
+      // 2000-02-01 -> 22
+      // 2000-02-29 -> 22
+      const result2 = calculateAgeRange({ year: 2000, month: 2 }, asOfDate2);
+      expect(result2).toEqual({ min: 22, max: 22 });
+    });
+
+    it('should calculate age for year, month, and day', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      // 2000-06-01 -> 23
+      const result = calculateAgeRange(
+        { year: 2000, month: 6, day: 1 },
+        asOfDate
+      );
+      expect(result).toEqual({ min: 23, max: 23 });
+
+      // 2000-06-02 -> 22
+      const result2 = calculateAgeRange(
+        { year: 2000, month: 6, day: 2 },
+        asOfDate
+      );
+      expect(result2).toEqual({ min: 22, max: 22 });
+    });
+
+    it('should calculate age for year and day (without month)', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      // 2000-01-15 -> 23
+      // 2000-12-15 -> 22
+      const result = calculateAgeRange({ year: 2000, day: 15 }, asOfDate);
+      expect(result).toEqual({ min: 22, max: 23 });
+    });
+
+    it('should throw error if year is missing', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      // @ts-expect-error Testing runtime validation
+      expect(() => calculateAgeRange({ month: 1 }, asOfDate)).toThrowError(
+        'Year is required for age calculation.'
+      );
+    });
+
+    it('should accept Temporal objects directly (duck typing)', () => {
+      const asOfDate = Temporal.PlainDate.from('2023-06-01');
+      const pym = Temporal.PlainYearMonth.from('2000-02');
+      const pd = Temporal.PlainDate.from('2000-06-01');
+
+      // PlainYearMonth has { year, month }
+      const result1 = calculateAgeRange(pym, asOfDate);
+      expect(result1).toEqual({ min: 23, max: 23 });
+
+      // PlainDate has { year, month, day }
+      const result2 = calculateAgeRange(pd, asOfDate);
+      expect(result2).toEqual({ min: 23, max: 23 });
+    });
+
+    it('should use current date if asOfDate is omitted', () => {
+      // We can't easily mock Temporal.Now, so we'll just check it runs and returns a valid range
+      // Assuming current year is >= 2025 based on context, let's pick a birth year way back
+      const result = calculateAgeRange({ year: 1900 });
+      expect(result.min).toBeGreaterThan(100);
+      expect(result.max).toBeGreaterThan(100);
+    });
   });
 });

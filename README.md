@@ -219,7 +219,7 @@ console.log(q1WithYear.calc().monthDayRanges);
 
 ## 🧰 Utility Functions
 
-### `mergeDateRanges(ranges: PlainDateRange[])`
+### `mergeDateRanges`
 
 Since this package splits ranges by year (e.g. `Dec 31` and `Jan 01` are separated), you can use this helper to merge adjacent ranges back together.
 
@@ -229,6 +229,33 @@ import { mergeDateRanges } from 'birthday-range';
 // Merges [2000-12-16 -> 2000-12-31] and [2001-01-01 -> 2001-12-15]
 const merged = mergeDateRanges(result.dateRanges);
 // Result: [{ start: '2000-12-16', end: '2001-12-15' }]
+```
+
+### `calculateAgeRange`
+
+Calculates the minimum and maximum age for a birth date (provided as a list of ranges or a partial date object) relative to a reference date.
+
+```typescript
+import { calculateAgeRange } from 'birthday-range';
+
+// Assume we have calculated ranges for someone born in 2000 as of 2023-06-01
+const asOfDate = Temporal.PlainDate.from('2023-06-01');
+
+// Method 1:
+calculateAgeRange({ year: 2000 }, asOfDate);
+
+// Method 2:
+calculateAgeRange([{ start: '2000-01-01', end: '2000-12-31' }], asOfDate);
+
+// Result: { min: 22, max: 23 }
+
+
+// If month/day are omitted, the full range of that year/month is considered.
+const ageRangeFromDate = calculateAgeRange(
+  { year: 2000, month: 2 }, 
+  asOfDate
+);
+// Result: { min: 23, max: 23 } (since Feb 2000 is before June 2023)
 ```
 
 ## 🛠️ Development

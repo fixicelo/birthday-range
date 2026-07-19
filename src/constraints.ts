@@ -1,4 +1,4 @@
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 import { getZodiacDateRange, getZodiacSign, ZodiacSign } from 'zodiac-mapper';
 import type { CalculationContext, PlainMonthDayRange } from './types.js';
 import { ensureNumber } from './utils/parsing.js';
@@ -144,16 +144,14 @@ export class IsLeapYearConstraint extends BaseConstraint {
       return { ...ctx, isLeapYear: this.isLeapYear };
     }
 
-    // Should I create a range for Feb 29 only?
-    const leapYearMonthDay = Temporal.PlainMonthDay.from({ month: 2, day: 29 });
-
     let dateRanges = ctx.dateRanges;
     if (dateRanges !== null) {
       dateRanges = dateRanges.filter((dr) => {
-        // Incoming date range should be already splited by year, i.e. dr.start.year === dr.end.year
-        const calcIsLeapYear =
-          leapYearMonthDay.toPlainDate({ year: dr.start.year }).day === 29;
-        return calcIsLeapYear === this.isLeapYear;
+        // Incoming date range should be already split by year, i.e. dr.start.year === dr.end.year
+        const year = dr.start.year;
+        const isLeap =
+          (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+        return isLeap === this.isLeapYear;
       });
     }
 

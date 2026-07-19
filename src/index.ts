@@ -1,7 +1,8 @@
 import BirthdayRange from './birthday-range.js';
 
 // Re-export core types and classes for extensibility and utility.
-export { Temporal } from '@js-temporal/polyfill';
+export { Temporal } from 'temporal-polyfill';
+export { getZodiacSignFromDate, ZodiacSign } from 'zodiac-mapper';
 export { BaseConstraint } from './constraints.js';
 export type { Constraint } from './constraints.js';
 export {

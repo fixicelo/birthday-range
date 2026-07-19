@@ -10,7 +10,7 @@ import BirthdayRange, {
   calculateAgeRange,
   PlainDateRange,
 } from '../src/index.js';
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 
 describe('README Examples', () => {
   it('1. Chainable Builder Pattern', () => {

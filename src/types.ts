@@ -1,4 +1,4 @@
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 
 /**
  * Represents a range between two `Temporal.PlainDate` objects.

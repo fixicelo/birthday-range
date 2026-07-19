@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 import BirthdayRange, { BaseConstraint } from '../src/index.js';
 import { YearConstraint } from '../src/constraints.js';
 import type { CalculationContext } from '../src/types.js';

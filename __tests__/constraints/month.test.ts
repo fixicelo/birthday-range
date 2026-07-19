@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 import { MonthConstraint } from '../../src/constraints.js';
 import { CalculationContext } from '../../src/index.js';
 

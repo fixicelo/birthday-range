@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/birthday-range.svg)](https://www.npmjs.com/package/birthday-range)
 [![License](https://img.shields.io/npm/l/birthday-range.svg)](https://github.com/fixicelo/birthday-range/blob/main/LICENSE)
 
-A TypeScript library for calculating possible birthday date ranges from partial information like age, zodiac sign, month, or year. It is built on the Temporal API via `@js-temporal/polyfill`.
+A TypeScript library for calculating possible birthday date ranges from partial information like age, zodiac sign, month, or year. It is built on the Temporal API via [`temporal-polyfill`](https://github.com/fullcalendar/temporal-polyfill).
 
 ## ✨ Key Features
 
@@ -28,7 +28,7 @@ npm install birthday-range
 yarn add birthday-range
 ```
 
-This package includes `@js-temporal/polyfill` as a direct dependency to ensure version compatibility and stability, as the Temporal API is still experimental.
+This package includes [`temporal-polyfill`](https://github.com/fullcalendar/temporal-polyfill) as a direct dependency for a reliable Temporal API implementation.
 
 ## 👨‍💻 Usage
 

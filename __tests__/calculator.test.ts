@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 import { calculate } from '../src/calculator.js';
 import type { CalculationContext } from '../src/types.js';
 import type { Constraint } from '../src/constraints.js';

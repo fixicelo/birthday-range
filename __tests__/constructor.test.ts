@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Temporal } from '@js-temporal/polyfill';
+import { Temporal } from 'temporal-polyfill';
 import BirthdayRange from '../src/index.js';
 import { BirthdayRangeOptions } from '../src/types.js';
 
